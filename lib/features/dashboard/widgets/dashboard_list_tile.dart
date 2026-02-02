@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:refrigerator/repositories/models/genre.dart';
 
 class DashboardListTile extends StatelessWidget {
-  final int index;
-  const DashboardListTile({super.key, required this.index});
+  final Genre genre;
+  const DashboardListTile({super.key, required this.genre});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: Center(
         child: Text(
-          'Item $index',
+          genre.name,
           style: TextStyle(
             color: Colors.red,
             fontSize: 22,
@@ -19,12 +20,12 @@ class DashboardListTile extends StatelessWidget {
           ),
         ),
       ),
-      subtitle: Center(child: Text('Subtitle $index')),
+      subtitle: Center(child: Text('Subtitle ${genre.id}')),
       leading: Icon(Icons.ac_unit_outlined),
       trailing: Icon(Icons.ac_unit_outlined),
       dense: true,
       onTap: () {
-        Navigator.of(context).pushNamed('/single', arguments: index);
+        Navigator.of(context).pushNamed('/single', arguments: genre.id);
       },
     );
   }

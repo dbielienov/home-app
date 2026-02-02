@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:refrigerator/features/dashboard/widgets/widgets.dart';
+import 'package:refrigerator/features/dashboard/widgets/widgets.dart'
+    show DashboardListTile;
+import 'package:refrigerator/repositories/genres/genres_repository.dart';
+import 'package:refrigerator/repositories/models/genre.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key, required this.title});
@@ -11,12 +14,15 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int _counter = 0;
+  final GenresRepository _repo = GenresRepository();
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  List<Genre> genres = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadGenres();
   }
 
   @override
@@ -24,17 +30,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        leading: SvgPicture.asset('assets/svg/logo.svg', width: 2, height: 2),
+        leadingWidth: 30,
+        leading: SvgPicture.asset('assets/svg/logo.svg'),
       ),
-      body: ListView.separated(
-        itemCount: 2,
-        itemBuilder: (context, index) {
-          return DashboardListTile(index: index);
-        },
-        separatorBuilder: (context, index) {
-          return Divider(color: Colors.red);
-        },
-      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.separated(
+              itemCount: genres.length,
+              itemBuilder: (context, index) {
+                return DashboardListTile(genre: genres[index]);
+              },
+              separatorBuilder: (context, index) {
+                return Divider(color: Colors.red);
+              },
+            ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
@@ -45,14 +54,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.school), label: 'School'),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.yellow,
-        child: const Icon(Icons.ac_unit_outlined),
-      ),
     );
   }
-}
 
+  Future<void> _loadGenres() async {
+    try {
+      final fetchedGenres = await _repo.getGenres();
+      if (!mounted) return;
+
+      setState(() {
+        genres = fetchedGenres;
+        isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+}
