@@ -37,6 +37,7 @@ dependencies:
   flutter_svg: ^2.2.3
   dio: ^5.9.1
   flutter_dotenv: ^6.0.0
+  get_it: ^9.2.0
 
 dev_dependencies:
   flutter_test:

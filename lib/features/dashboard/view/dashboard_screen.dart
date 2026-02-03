@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get_it/get_it.dart';
 import 'package:refrigerator/features/dashboard/widgets/widgets.dart'
     show DashboardListTile;
-import 'package:refrigerator/repositories/genres/genres_repository.dart';
+import 'package:refrigerator/repositories/genres/abstract_genres_repository.dart';
 import 'package:refrigerator/repositories/models/genre.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -14,7 +15,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final GenresRepository _repo = GenresRepository();
+  final AbstractGenresRepository _repo = GetIt.I<AbstractGenresRepository>();
 
   List<Genre> genres = [];
   bool isLoading = true;
