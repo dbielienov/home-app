@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:refrigerator/repositories/genres/abstract_genres_repository.dart';
 import 'package:refrigerator/repositories/models/genre.dart';
@@ -15,6 +17,8 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       } catch (e) {
         final message = e.toString();
         emit(DashboardError(message));
+      } finally {
+        event.completer?.complete();
       }
     });
   }
