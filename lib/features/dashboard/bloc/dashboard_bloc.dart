@@ -10,8 +10,10 @@ part 'dashboard_state.dart';
 class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   DashboardBloc(this._repo) : super(DashboardInitial()) {
     on<DashboardLoadEvent>((event, emit) async {
-      emit(DashboardLoading());
       try {
+        if (state is! DashboardLoaded) {
+          emit(DashboardLoading());
+        }
         final fetchedGenres = await _repo.getGenres();
         emit(DashboardLoaded(fetchedGenres));
       } catch (e) {
