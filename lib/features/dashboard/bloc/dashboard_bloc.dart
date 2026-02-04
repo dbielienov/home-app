@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:refrigerator/repositories/genres/abstract_genres_repository.dart';
 import 'package:refrigerator/repositories/models/genre.dart';
