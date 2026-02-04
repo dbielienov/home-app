@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
-import 'package:refrigerator/features/dashboard/widgets/widgets.dart'
-    show DashboardListTile;
+import 'package:refrigerator/features/dashboard/bloc/dashboard_bloc.dart';
+import 'package:refrigerator/features/dashboard/widgets/dashboard_list_tile.dart';
 import 'package:refrigerator/repositories/genres/abstract_genres_repository.dart';
-import 'package:refrigerator/repositories/models/genre.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key, required this.title});
@@ -16,14 +16,12 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final AbstractGenresRepository _repo = GetIt.I<AbstractGenresRepository>();
-
-  List<Genre> genres = [];
-  bool isLoading = true;
+  final DashboardBloc _dashboardBloc = DashboardBloc(GetIt.I<AbstractGenresRepository>());
 
   @override
   void initState() {
     super.initState();
-    _loadGenres();
+    _dashboardBloc.add(DashboardLoadEvent());
   }
 
   @override
@@ -34,45 +32,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
         leadingWidth: 30,
         leading: SvgPicture.asset('assets/svg/logo.svg'),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.separated(
-              itemCount: genres.length,
+      body: BlocBuilder<DashboardBloc, DashboardState>(
+        bloc: _dashboardBloc,
+        builder: (context, state) {
+          if(state is DashboardLoaded) {
+            return  ListView.separated(
+              itemCount: state.genres.length,
               itemBuilder: (context, index) {
-                return DashboardListTile(genre: genres[index]);
+                return DashboardListTile(genre: state.genres[index]);
               },
               separatorBuilder: (context, index) {
-                return Divider(color: Colors.red);
+                return Divider(color: Colors.green);
               },
-            ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Business',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.school), label: 'School'),
-        ],
-      ),
+            );
+          }
+          if(state is DashboardError) {
+            return Center(child: Text(state.message));
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
+      )
     );
-  }
-
-  Future<void> _loadGenres() async {
-    try {
-      final fetchedGenres = await _repo.getGenres();
-      if (!mounted) return;
-
-      setState(() {
-        genres = fetchedGenres;
-        isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-
-      setState(() {
-        isLoading = false;
-      });
-    }
   }
 }
