@@ -16,7 +16,9 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final AbstractGenresRepository _repo = GetIt.I<AbstractGenresRepository>();
-  final DashboardBloc _dashboardBloc = DashboardBloc(GetIt.I<AbstractGenresRepository>());
+  final DashboardBloc _dashboardBloc = DashboardBloc(
+    GetIt.I<AbstractGenresRepository>(),
+  );
 
   @override
   void initState() {
@@ -35,8 +37,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: BlocBuilder<DashboardBloc, DashboardState>(
         bloc: _dashboardBloc,
         builder: (context, state) {
-          if(state is DashboardLoaded) {
-            return  ListView.separated(
+          if (state is DashboardLoaded) {
+            return ListView.separated(
               itemCount: state.genres.length,
               itemBuilder: (context, index) {
                 return DashboardListTile(genre: state.genres[index]);
@@ -46,12 +48,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
               },
             );
           }
-          if(state is DashboardError) {
-            return Center(child: Text(state.message));
+          if (state is DashboardError) {
+            return Center(
+              child: SizedBox(
+                height: 250,
+                width: 200,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Something went wrong'),
+                    OutlinedButton(
+                      onPressed: () {
+                        _dashboardBloc.add(DashboardLoadEvent());
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
           return const Center(child: CircularProgressIndicator());
         },
-      )
+      ),
     );
   }
 }
